@@ -1,36 +1,48 @@
-import { VisuallyHiddenInput } from '@chakra-ui/react';
-import { Box, FormControl, Modal, Stack, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { Box, Button, FormControl, InputLabel, MenuItem, Modal, Select, SelectChangeEvent, Stack, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { ButtonLink } from '../../../../components/custom-button';
 import CustomTextField from '../../../../components/custom-text-field';
+import { LineMdMenuToCloseTransition } from '../../../../components/icons';
+import { ProductEntity } from '../../../../entities/product-entity';
+import { useCategory } from '../../hooks/category';
+import { useProductUpdate } from '../../hooks/product';
 import PriceInput from '../input/input-price';
 import QtyInput from '../input/input-qty';
-import { LineMdMenuToCloseTransition } from '../../../../components/icons';
 
 interface InitialFocusModalProps {
     isOpen: boolean;
     onClose: () => void;
+    product: ProductEntity;
 }
 
-function EditProductModal({ isOpen, onClose }: InitialFocusModalProps) {
+function EditProductModal({ isOpen, onClose, product }: InitialFocusModalProps) {
+    const { register, handleSubmit, onSubmit, errors, setValue, isLoading } = useProductUpdate(product.id);
+    const { data } = useCategory();
+    const [categoryId, setCategoryId] = useState<string>('');
     const [fileName, setFileName] = useState('');
-    const [valuesPrice, setValuesPrice] = useState({ numberformat: '' });
-    const [valuesQty, setValuesQty] = useState({ numberformat: '' });
-
-    const handleFileChange = (event: any) => {
-        const files = event.target.files;
-        if (files.length > 0) {
-            setFileName(files[0].name);
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setFileName(file.name);
         }
     };
-
-    const handleChangePrice = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValuesPrice({ ...valuesPrice, [event.target.name]: event.target.value });
+    const handleChangeCategory = (event: SelectChangeEvent<string>) => {
+        const selectedValue = event.target.value;
+        setCategoryId(selectedValue);
     };
 
-    const handleChangeQty = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValuesQty({ ...valuesQty, [event.target.name]: event.target.value });
-    };
+    useEffect(() => {
+        if (product) {
+            setValue('productName', product.productName);
+            setValue('productDesc', product.productDesc);
+            setValue('price', product.price);
+            setValue('qty', product.Qty);
+            if (product.image) {
+                setFileName(product.image.url);
+            }
+        }
+    }, [product, setValue]);
+
 
     return (
         <Modal
@@ -42,32 +54,52 @@ function EditProductModal({ isOpen, onClose }: InitialFocusModalProps) {
                 <ButtonLink to={''} onClick={onClose} sx={{ position: 'absolute', right: 77, top: 5, color: 'primary.main', borderRadius: 'rounded !important', width: '40px', height: '40px' }}>
                     <LineMdMenuToCloseTransition />
                 </ButtonLink>
-                <Typography id="modal-modal-title" variant="h6">
-                    Edit Product
-                </Typography>
-                <FormControl sx={{ backgroundColor: 'transparent', width: '100%', mt: 3 }}>
-                    <Stack direction={'row'} alignItems={'center'}>
-                        <ButtonLink
-                            to={''}
-                            component="label"
-                            tabIndex={-1}>
-                            <Typography sx={{ p: 1 }}>Upload Image</Typography>
-                            <VisuallyHiddenInput onChange={handleFileChange} sx={{ p: 0.2 }} type='file' multiple hidden />
-                        </ButtonLink>
-                        {fileName && <Typography sx={{ ml: 2, color: 'primary.main' }}>{fileName}</Typography>}
+                <form onSubmit={handleSubmit(onSubmit)} encType='multipart/form-data'>
+                    <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
+                        <Typography id="modal-modal-title" variant="h6">
+                            Edit Product
+                        </Typography>
+                        <FormControl sx={{ width: '15%' }}>
+                            <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                label="Category"
+                                {...register('categoryId')}
+                                value={categoryId}
+                                onChange={handleChangeCategory} >
+                                {data?.map((category) => (
+                                    <MenuItem key={category.id} value={category.id}>{category.categoryName}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </Stack>
-                </FormControl>
-                <FormControl sx={{ backgroundColor: 'transparent', width: '100%', mt: 3 }}>
-                    <CustomTextField variant="outlined" label="Name" />
-                </FormControl>
-                <FormControl sx={{ backgroundColor: 'transparent', width: '100%', mt: 3 }}>
-                    <CustomTextField variant="outlined" label="Description" multiline rows={3} />
-                </FormControl>
-                <PriceInput value={valuesPrice.numberformat} onChange={handleChangePrice} />
-                <QtyInput value={valuesQty.numberformat} onChange={handleChangeQty} />
-                <Box sx={{ mt: 6 }}>
-                    <ButtonLink to="" sx={{ p: '8px 48.5%', backgroundColor: '#56c05a !important', ":hover": { backgroundColor: 'white !important', color: '#56c05a !important' } }}>Save</ButtonLink>
-                </Box>
+                    <FormControl sx={{ backgroundColor: 'transparent', width: '100%', mt: 3 }}>
+                        <Stack direction={'row'} alignItems={'center'}>
+                            <Button
+                                component="label"
+                                tabIndex={-1}
+                                sx={{ borderRadius: '5px 0 0 5px' }}>
+                                <Typography sx={{ p: .5, fontSize: '13px' }}>Upload Image</Typography>
+                                <CustomTextField {...register('image')} onChange={handleFileChange} sx={{ p: 0.2, display: 'none' }} type='file' />
+                            </Button>
+                            {fileName && <Typography sx={{ ml: 2, color: 'primary.main' }}>{fileName}</Typography>}
+                        </Stack>
+                    </FormControl>
+                    <FormControl sx={{ backgroundColor: 'transparent', width: '100%', mt: 3 }}>
+                        <CustomTextField variant="outlined" {...register('productName')} label="Name" />
+                    </FormControl>
+                    <FormControl sx={{ backgroundColor: 'transparent', width: '100%', mt: 3 }}>
+                        <CustomTextField variant="outlined" {...register('productDesc')} label="Description" multiline rows={3} />
+                    </FormControl>
+                    <PriceInput register={register} setValuePrice={setValue} errors={errors} initialValue={product.price} />
+                    <QtyInput register={register} setValueQty={setValue} errors={errors} initialValue={product.Qty} />
+                    <Box sx={{ mt: 3 }}>
+                        <Button disabled={isLoading} type='submit' sx={{ p: '5px 48.5%', backgroundColor: '#56c05a !important', ":hover": { backgroundColor: 'white !important', color: '#56c05a !important' } }}>
+                            {isLoading ? "Loading..." : "Update"}
+                        </Button>
+                    </Box>
+                </form>
             </Box>
         </Modal>
     );

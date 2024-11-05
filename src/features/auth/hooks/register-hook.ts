@@ -7,6 +7,12 @@ import { RegisterResponseDTO } from "../dto/register-dto";
 import { setUser } from "../../../store/auth/auth-slice";
 import Cookies from "js-cookie";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
+import { toast } from 'react-toastify';
+
+interface ErrorResponse {
+    message: string;
+}
 
 export function useRegisterForm() {
     const {
@@ -26,9 +32,15 @@ export function useRegisterForm() {
 
             dispatch(setUser(user));
             Cookies.set("token", token, { expires: 1 });
+            toast.success("Registration successful!");
             navigate("/");
         } catch (error) {
-            console.log(error);
+            const axiosError = error as AxiosError;
+            if (axiosError.response) {
+                toast.error((axiosError.response.data as ErrorResponse).message || "Registration failed!");
+            } else {
+                toast.error("Unexpected error occurred!");
+            }
         }
     };
 

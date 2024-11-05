@@ -14,7 +14,7 @@ interface InitialFocusModalProps {
 }
 
 function AddProductModal({ isOpen, onClose }: InitialFocusModalProps) {
-    const [_, setFileName] = useState('');
+    const [fileName, setFileName] = useState('');
     const [categoryId, setCategoryId] = useState<string>('');
 
     const { register, handleSubmit, onSubmit, setValue, isLoading, errors } = useProductCreate(+categoryId);
@@ -42,10 +42,7 @@ function AddProductModal({ isOpen, onClose }: InitialFocusModalProps) {
                 <ButtonLink to={''} onClick={onClose} sx={{ position: 'absolute', right: 77, top: 5, color: 'primary.main', borderRadius: 'rounded !important', width: '40px', height: '40px' }}>
                     <LineMdMenuToCloseTransition />
                 </ButtonLink>
-                <form onSubmit={handleSubmit(onSubmit, (error) => {
-                    console.log(error);
-
-                })} encType='multipart/form-data'>
+                <form onSubmit={handleSubmit(onSubmit)} encType='multipart/form-data'>
                     <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
                         <Typography id="modal-modal-title" variant="h6">
                             Add Product
@@ -67,9 +64,14 @@ function AddProductModal({ isOpen, onClose }: InitialFocusModalProps) {
                     </Stack>
                     <FormControl sx={{ backgroundColor: 'transparent', width: '100%', mt: 3 }}>
                         <Stack direction={'row'} alignItems={'center'}>
-                            <Typography sx={{ p: 1 }}>Upload Image</Typography>
-                            <CustomTextField {...register('image')} onChange={handleFileChange} sx={{ p: 0.2 }} type='file' hidden />
-                            {/* {fileName && <Typography sx={{ ml: 2, color: 'primary.main' }}>{fileName}</Typography>} */}
+                            <Button
+                                component="label"
+                                tabIndex={-1}
+                                sx={{ borderRadius: '5px 0 0 5px' }}>
+                                <Typography sx={{ p: .5, fontSize: '13px' }}>Upload Image</Typography>
+                                <CustomTextField onChange={handleFileChange} sx={{ p: 0.2, display: 'none' }} type='file' />
+                            </Button>
+                            {fileName && <Typography sx={{ ml: 2, color: 'primary.main' }}>{fileName}</Typography>}
                         </Stack>
                     </FormControl>
                     <FormControl sx={{ backgroundColor: 'transparent', width: '100%', mt: 3 }}>

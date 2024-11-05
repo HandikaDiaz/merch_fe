@@ -1,32 +1,35 @@
 import { Box, Stack, Typography } from "@mui/material"
+import { useProfile } from "../../hooks/profile"
 
 function ProfileCard() {
+    const { data } = useProfile(); 
+    
     return (
         <Stack direction={'row'} gap={5}>
             <img
-                src="https://i.pinimg.com/736x/86/01/b1/8601b1511b1986fc1e52410a9daa7e87.jpg"
+                src={data?.image?.url}
                 alt="item" height={400} style={{ objectFit: 'contain', borderRadius: '10px' }}
             />
             <Box>
                 <Box sx={{ mb: 1.5 }}>
                     <Typography sx={{ color: 'secondary.main' }}>Name</Typography>
-                    <Typography sx={{ color: 'primary.main' }}>Handika</Typography>
+                    <Typography sx={{ color: 'primary.main' }}>{data?.username}</Typography>
                 </Box>
                 <Box sx={{ mb: 1.5 }}>
                     <Typography sx={{ color: 'secondary.main' }}>Email</Typography>
-                    <Typography sx={{ color: 'primary.main' }}>Handika@gmail.com</Typography>
+                    <Typography sx={{ color: 'primary.main' }}>{data?.user?.email}</Typography>
                 </Box>
                 <Box sx={{ mb: 1.5 }}>
                     <Typography sx={{ color: 'secondary.main' }}>Phone</Typography>
-                    <Typography sx={{ color: 'primary.main' }}>0858204027</Typography>
+                    <Typography sx={{ color: 'primary.main' }}>{data?.phone}</Typography>
                 </Box>
                 <Box sx={{ mb: 1.5 }}>
                     <Typography sx={{ color: 'secondary.main' }}>Gender</Typography>
-                    <Typography sx={{ color: 'primary.main' }}>Male</Typography>
+                    <Typography sx={{ color: 'primary.main' }}>{data?.gender}</Typography>
                 </Box>
                 <Box sx={{ mb: 1.5 }}>
                     <Typography sx={{ color: 'secondary.main' }}>Address</Typography>
-                    <Typography sx={{ color: 'primary.main' }}>Lorem ipsum</Typography>
+                    <Typography sx={{ color: 'primary.main' }}>{data?.address}</Typography>
                 </Box>
             </Box>
         </Stack>

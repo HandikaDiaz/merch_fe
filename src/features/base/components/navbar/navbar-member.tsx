@@ -1,14 +1,23 @@
 import { Avatar, Badge, IconButton, Input, Stack, Tooltip } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import logo from '../../../../assets/logo.svg';
 import { ButtonLink } from "../../../../components/custom-button";
 import { LineMdEmail, LineMdEmailAlert, LineMdSearch, MdiLightCart } from "../../../../components/icons";
-import DropDownNavbar from "../modal/navbar";
+import { useCart } from "../../hooks/cart";
+import { useProfile } from "../../hooks/profile";
+import { useSearchContext } from "../../pages/search";
 import DropDownCart from "../modal/cart";
+import DropDownNavbar from "../modal/navbar";
 
 function NavbarMember() {
+    const { data: cartData } = useCart();
+    const cartBadge = cartData?.reduce((acc, item) => acc + item.cartItem.length, 0);
+
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const [anchorElCart, setAnchorElCart] = React.useState<null | HTMLElement>(null);
+    const { setSearchQuery } = useSearchContext();
+    const [inputValue, setInputValue] = useState("");
+
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
     };
@@ -21,7 +30,13 @@ function NavbarMember() {
     const handleCloseCartMenu = () => {
         setAnchorElCart(null);
     };
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const query = event.target.value;
+        setInputValue(query);
+        setSearchQuery(query);
+    };
     const badgeContent = 10;
+    const { data } = useProfile();
 
     return (
         <Stack direction={'row'} p={2} sx={{ justifyContent: 'space-between' }}>
@@ -31,7 +46,7 @@ function NavbarMember() {
             </Stack>
             <Stack flex={3} direction={'row'} gap={2} sx={{ color: 'primary.main', alignItems: 'center' }} justifyContent={'center'}>
                 <LineMdSearch />
-                <Input sx={{ px: 1, width: '100%' }} placeholder="Search…" />
+                <Input sx={{ px: 1, width: '100%' }} placeholder="Search…" value={inputValue} onChange={handleSearchChange} />
             </Stack>
             <Stack direction={'row'} gap={1.6} justifyContent={'end'} sx={{ color: 'primary.main', alignItems: 'center' }} flex={1}>
                 <ButtonLink to={'/complain'} sx={{ backgroundColor: 'transparent !important', mr: 2 }}>
@@ -40,13 +55,17 @@ function NavbarMember() {
                     </Badge>
                 </ButtonLink>
                 <IconButton onClick={handleOpenCartMenu} sx={{ backgroundColor: 'transparent !important', mr: .5 }}>
-                    <Badge color="error" badgeContent={9}>
+                    {cartBadge && cartBadge > 0 ? (
+                        <Badge color="error" badgeContent={cartBadge}>
+                            <MdiLightCart />
+                        </Badge>
+                    ) : (
                         <MdiLightCart />
-                    </Badge>
+                    )}
                 </IconButton>
                 <Tooltip title="Profile">
                     <IconButton onClick={handleOpenUserMenu}>
-                        <Avatar src="https://i.pinimg.com/736x/e5/3c/72/e53c729536000bbe560d80be541a4064.jpg" />
+                        <Avatar src={data?.image?.url} />
                     </IconButton>
                 </Tooltip>
                 <DropDownNavbar anchorEl={anchorElUser} handleClose={handleCloseUserMenu} />

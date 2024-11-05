@@ -6,6 +6,7 @@ import { apiV1 } from "../../../utils/api";
 import { CategoryEntity } from "../../../entities/category-entity";
 import { CreateCategoryDTO, RequestCategoryDto } from "../dto/category-dto.";
 import Cookies from "js-cookie";
+import { toast } from 'react-toastify';
 
 export function useCategory() {
     const {
@@ -15,7 +16,7 @@ export function useCategory() {
         formState: { errors },
     } = useForm<CreatecategoryFormInput>({
         resolver: zodResolver(categorySchema),
-    })
+    });
     const queryClient = useQueryClient();
 
     async function getCategory() {
@@ -29,7 +30,7 @@ export function useCategory() {
         queryKey: ['category'],
         queryFn: getCategory
     });
-    
+
     async function createCategory(data: RequestCategoryDto) {
         const res = await apiV1.post('/category/create', data, {
             headers: {
@@ -37,16 +38,17 @@ export function useCategory() {
             }
         });
         queryClient.invalidateQueries({ queryKey: ['category'] });
+        toast.success('Category created successfully!');
         return res.data;
     }
 
     const { mutateAsync: createCategoryAsync } = useMutation<
-    CreateCategoryDTO,
-    null,
-    CreateCategoryDTO>({
-        mutationKey: ['createCategory'],
-        mutationFn: createCategory,
-    });
+        CreateCategoryDTO,
+        null,
+        CreateCategoryDTO>({
+            mutationKey: ['createCategory'],
+            mutationFn: createCategory,
+        });
 
     async function onSubmit(data: CreatecategoryFormInput) {
         try {
@@ -55,6 +57,7 @@ export function useCategory() {
             reset();
         } catch (error) {
             console.log(error);
+            toast.error('Failed to create category.');
         }
     }
 
@@ -65,7 +68,7 @@ export function useCategory() {
         errors,
         data,
         isLoading
-    }
+    };
 }
 
 export function useCategoryUpdate(categoryId: number) {
@@ -76,7 +79,7 @@ export function useCategoryUpdate(categoryId: number) {
         setValue
     } = useForm<CreatecategoryFormInput>({
         resolver: zodResolver(categorySchema),
-    })
+    });
     const queryClient = useQueryClient();
 
     async function updateCategory(data: RequestCategoryDto) {
@@ -86,16 +89,17 @@ export function useCategoryUpdate(categoryId: number) {
             }
         });
         queryClient.invalidateQueries({ queryKey: ['category'] });
+        toast.success('Category updated successfully!');
         return res.data;
     }
 
     const { mutateAsync: updateCategoryAsync } = useMutation<
-    CreateCategoryDTO,
-    null,
-    CreateCategoryDTO>({
-        mutationKey: ['updateCategory'],
-        mutationFn: updateCategory,
-    });
+        CreateCategoryDTO,
+        null,
+        CreateCategoryDTO>({
+            mutationKey: ['updateCategory'],
+            mutationFn: updateCategory,
+        });
 
     async function onSubmit(data: CreatecategoryFormInput) {
         try {
@@ -103,6 +107,7 @@ export function useCategoryUpdate(categoryId: number) {
             queryClient.invalidateQueries({ queryKey: ['category'] });
         } catch (error) {
             console.log(error);
+            toast.error('Failed to update category.');
         }
     }
 
@@ -112,11 +117,12 @@ export function useCategoryUpdate(categoryId: number) {
         onSubmit,
         errors,
         setValue
-    }
+    };
 }
 
 export function useCategoryDelete(categoryId: number) {
     const queryClient = useQueryClient();
+
     const handleDelete = async () => {
         try {
             const res = await apiV1.delete(`/category/delete/${categoryId}`, {
@@ -125,13 +131,15 @@ export function useCategoryDelete(categoryId: number) {
                 }
             });
             queryClient.invalidateQueries({ queryKey: ['category'] });
+            toast.success('Category deleted successfully!');
             return res.data;
         } catch (error) {
             console.log(error);
+            toast.error('Failed to delete category.');
         }
     }
 
     return {
         handleDelete
-    }
+    };
 }

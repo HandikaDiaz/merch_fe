@@ -1,14 +1,17 @@
 import { Box, Modal, Typography } from '@mui/material';
 import { ButtonLink } from '../../../../components/custom-button';
-import { CategoryEntity } from '../../../../entities/category-entity';
-import { useCategoryDelete } from '../../hooks/category';
+import { ProductEntity } from '../../../../entities/product-entity';
+import { useProductDelete } from '../../hooks/product';
 
 interface InitialFocusModalProps {
     isOpen: boolean;
     onClose: () => void;
+    product: ProductEntity;
 }
 
-function DeletProductModal({ isOpen, onClose }: InitialFocusModalProps) {
+function DeletProductModal({ isOpen, onClose, product }: InitialFocusModalProps) {
+    const { handleDelete } = useProductDelete(+product);
+
     return (
         <Modal
             open={isOpen}
@@ -22,7 +25,7 @@ function DeletProductModal({ isOpen, onClose }: InitialFocusModalProps) {
                     Are you sure you want to delete this product?
                 </Typography>
                 <Box sx={{ mt: 6, display: 'flex', justifyContent: 'right', gap: 1 }}>
-                    <ButtonLink to="" sx={{ p: '5px 52.5px 5px 30px', backgroundColor: '#56c05a !important', ":hover": { backgroundColor: 'white !important', color: '#56c05a !important' } }}>
+                    <ButtonLink to="" sx={{ p: '5px 52.5px 5px 30px', backgroundColor: '#56c05a !important', ":hover": { backgroundColor: 'white !important', color: '#56c05a !important' } }} onClick={handleDelete}>
                             Yes
                         </ButtonLink>
                     <ButtonLink to="" sx={{ p: '5px 52.5px 5px 30px', backgroundColor: '#f74d4d !important', ":hover": { backgroundColor: 'white !important', color: '#f74d4d !important' } }} onClick={onClose}>

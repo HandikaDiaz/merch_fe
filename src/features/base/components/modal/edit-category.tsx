@@ -36,7 +36,7 @@ function EditCategoryModal({ isOpen, onClose, category }: InitialFocusModalProps
                 </Typography>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <FormControl sx={{ backgroundColor: 'transparent', width: '100%', mt: 3 }}>
-                        <CustomTextField variant="outlined" label="Name"  {...register('categoryName')} />
+                        <CustomTextField variant="outlined" label="Name" {...register('categoryName')} />
                     </FormControl>
                     <Box sx={{ mt: 6 }}>
                         <Button type='submit' sx={{ p: '5px 48.5%', backgroundColor: '#56c05a !important', ":hover": { backgroundColor: 'white !important', color: '#56c05a !important' } }}>

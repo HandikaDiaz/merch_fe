@@ -28,8 +28,6 @@ function DropDownCart({ anchorEl, handleClose }: DropDownProps) {
                     Cart
                 </ButtonLink>
                 <ProductItemDropdown />
-                <ProductItemDropdown />
-                <ProductItemDropdown />
                 <hr />
                 <InfoCart />
                 <ButtonLink to={'/checkout'} sx={{ width: '100%', py: 1, fontSize: '18px', bgcolor: 'primary.main', color: 'secondary.main', mb: 3, ":hover": { bgcolor: 'secondary.main', color: 'primary.main' } }}>

@@ -20,7 +20,7 @@ export default function RegisterForm() {
                         <Input sx={{ p: 0.2 }} type='password' {...register('password')} />
                     </FormControl>
                     <Button sx={{ mt: 2 }} type='submit' >
-                        Login
+                        Register
                     </Button>
                 </Stack>
             </form>

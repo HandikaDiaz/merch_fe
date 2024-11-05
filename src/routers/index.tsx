@@ -11,6 +11,8 @@ import ListProduct from "../features/base/pages/list-product";
 import Complain from "../features/base/pages/complain";
 import Dashboard from "../features/base/router/dashboard";
 import Checkout from "../features/base/pages/checkout";
+import OrderList from "../features/base/pages/order-list";
+import TableCart from "../features/base/pages/table-cart";
 
 export function AppRouter() {
     const router = createBrowserRouter([
@@ -33,7 +35,11 @@ export function AppRouter() {
             children: [
                 {
                     index: true,
-                    element: <>hallo</>,
+                    element: <TableCart />,
+                },
+                {
+                    path: 'list-order',
+                    element: <OrderList />,
                 },
                 {
                     path: 'list-category',
@@ -54,11 +60,11 @@ export function AppRouter() {
                     element: <Product />,
                 },
                 {
-                    path: 'profile',
+                    path: 'profile/:username',
                     element: <Profile />,
                 },
                 {
-                    path: 'detail',
+                    path: 'detail/:productName',
                     element: <DetailProduct />,
                 },
                 {
